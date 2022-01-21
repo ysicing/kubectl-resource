@@ -69,8 +69,7 @@ func NewFromConfig(cc *ClientConfig) (client kubernetes.Interface, err error) {
 	}
 
 	client = clientset
-
-	return
+	return client, nil
 }
 
 // NewInCluster returns a new in-cluster kubernetes client.

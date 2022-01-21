@@ -28,5 +28,21 @@ jobs:
       - uses: actions/checkout@v1
         with:
           fetch-depth: 1
-      - name: Update new version in krew-index
-        uses: rajatjindal/krew-release-bot@v0.0.40
+      - name: build ergo
+        run: |
+          export TZ='Asia/Shanghai'
+          export PATH=$PATH:$(go env GOPATH)/bin
+          make build
+          pushd dist
+          sha256sum kr_darwin_amd64 > kr_darwin_amd64.sha256sum
+          sha256sum kr_linux_amd64 > kr_linux_amd64.sha256sum
+          sha256sum kr_windows_amd64.exe > kr_windows_amd64.sha256sum
+          sha256sum kr_darwin_arm64 > kr_darwin_arm64.sha256sum
+          sha256sum kr_linux_arm64 > kr_linux_arm64.sha256sum
+          popd
+          ./gen.sh
+          make release
+        env:
+          GITHUB_RELEASE_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+      # - name: Update new version in krew-index
+      #   uses: rajatjindal/krew-release-bot@v0.0.40

@@ -29,23 +29,12 @@ default: fmt golint ## fmt code
 
 build: clean ## 构建二进制
 	@echo "build bin ${BUILD_VERSION} ${BUILD_DATE} ${COMMIT_SHA1}"
-	#@bash hack/docker/build.sh ${version} ${tagversion} ${commit_sha1}
-	# go get github.com/mitchellh/gox
 	@gox -osarch="darwin/amd64 darwin/arm64 linux/amd64 linux/arm64 windows/amd64 windows/arm64" \
-        -output="dist/{{.Dir}}_{{.OS}}_{{.Arch}}" \
+        -output="dist/kr_{{.OS}}_{{.Arch}}" \
     	-ldflags   "-w -s \
-    				-X 'github.com/ysicing/ergo/version.Version=${BUILD_VERSION}' \
-                    -X 'github.com/ysicing/ergo/version.BuildDate=${BUILD_DATE}' \
-                    -X 'github.com/ysicing/ergo/version.GitCommitHash=${COMMIT_SHA1}'"
-
-docker: build ## 构建镜像
-	@echo "build docker images ${BUILD_VERSION}"
-	@docker build -t ysicing/ergo .
-	@docker build -t ysicing/ergo:${BUILD_VERSION} .
-
-dpush: docker
-	@docker push ysicing/ergo
-    @docker push ysicing/ergo:${BUILD_VERSION}
+    				-X 'github.com/ysicing/kube-resource/pkg/cmd.Version=${BUILD_VERSION}' \
+                    -X 'github.com/ysicing/kube-resource/pkg/cmd.BuildDate=${BUILD_DATE}' \
+                    -X 'github.com/ysicing/kube-resource/pkg/cmd.GitCommitHash=${COMMIT_SHA1}'"
 
 release:  ## github release
 	ghr -u ysicing -t $(GITHUB_RELEASE_TOKEN) -b "release ${BUILD_VERSION}" -n "release ${BUILD_VERSION}" -soft --debug ${BUILD_VERSION} dist
@@ -56,33 +45,7 @@ pre-release:  ## github pre-release
 clean: ## clean
 	rm -rf dist
 
-install: clean ## install
-	go install \
-		-ldflags   "-w -s \
-						-X 'github.com/ysicing/ergo/cmd.Version=${BUILD_VERSION}' \
-                        -X 'github.com/ysicing/ergo/cmd.BuildDate=${BUILD_DATE}' \
-                        -X 'github.com/ysicing/ergo/cmd.CommitID=${COMMIT_SHA1}'"
-
-deb: build ## build deb
-	./deb.sh
-
-doc: ## gen docs
-	go run ./hack/gendoc/doc.go
-	cp -a docs/ergo.md docs/index.md 
-
-cleanvm: ## clem lima vm
-	limactl ls | grep debian && (limactl stop debian || echo "skip stop") &&limactl rm debian || echo "not found"
-
-vm: cleanvm ## start lima vm
-	limactl start common/debian.yml
-
-shell: ## shell debian
-	limactl shell debian
-
-local-test: build ## 本地测试
-	limactl cp ./dist/ergo_linux_amd64 debian:/tmp
-
-.PHONY : build release clean install
+.PHONY : build release clean
 
 .EXPORT_ALL_VARIABLES:
 
