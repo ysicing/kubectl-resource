@@ -8,7 +8,7 @@ linuxarm64sha=$(cat dist/kr_linux_arm64.sha256sum | awk '{print $1}')
 
 
 cat > kr.rb <<EOF
-class KR < Formula
+class Kr < Formula
     desc "Devops tools kube-resource"
     homepage "https://github.com/ysicing/kube-resource"
     version "${version}"
