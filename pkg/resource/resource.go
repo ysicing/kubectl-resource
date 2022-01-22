@@ -22,7 +22,7 @@ type Res struct {
 	Resources corev1.ResourceRequirements `json:"resources" yaml:"resources"`
 }
 
-func FetchAndPrint(kubeContext, kubeConfig, namespace, labels, format string) error {
+func FetchAndPrint(kubeContext, kubeConfig, namespace, labels, format string, sts bool) error {
 	kubecfg := &kube.ClientConfig{
 		KubeCtx:    kubeContext,
 		KubeConfig: kubeConfig,
@@ -32,17 +32,20 @@ func FetchAndPrint(kubeContext, kubeConfig, namespace, labels, format string) er
 		fmt.Printf("Error connecting to Kubernetes: %v\n", err)
 		return err
 	}
-	deployList := getDeploy(client, namespace, labels)
+	appList := getDeploy(client, namespace, labels)
+	if sts {
+		appList = append(appList, getSts(client, namespace, labels)...)
+	}
 
 	switch strings.ToLower(format) {
 	case "json":
-		return output.EncodeJSON(os.Stdout, deployList)
+		return output.EncodeJSON(os.Stdout, appList)
 	case "yaml":
-		return output.EncodeYAML(os.Stdout, deployList)
+		return output.EncodeYAML(os.Stdout, appList)
 	default:
 		table := uitable.New()
 		table.AddRow("NAMESPACE", "NAME", "TYPE", "CPU REQUESTS", "CPU LIMITS", "MEMORY REQUESTS", "MEMORY LIMITS")
-		for _, d := range deployList {
+		for _, d := range appList {
 			table.AddRow(d.Namespace, d.Name, d.Type, d.Resources.Requests.Cpu(), d.Resources.Limits.Cpu(), d.Resources.Requests.Memory(), d.Resources.Limits.Memory())
 		}
 		return output.EncodeTable(os.Stdout, table)
@@ -62,6 +65,42 @@ func getDeploy(clientset kubernetes.Interface, namespace, label string) []Res {
 			Namespace: d.Namespace,
 			Name:      d.Name,
 			Type:      "Deployment",
+		}
+		var rc, rm, lc, lm int64
+		for _, c := range d.Spec.Template.Spec.Containers {
+			rc = rc + c.Resources.Requests.Cpu().MilliValue()*int64(*d.Spec.Replicas)
+			rm = rm + c.Resources.Requests.Memory().Value()*int64(*d.Spec.Replicas)
+			lc = lc + c.Resources.Limits.Cpu().MilliValue()*int64(*d.Spec.Replicas)
+			lm = lm + c.Resources.Limits.Memory().Value()*int64(*d.Spec.Replicas)
+		}
+		r.Resources = corev1.ResourceRequirements{
+			Limits: corev1.ResourceList{
+				"cpu":    *resource.NewQuantity(lc, resource.DecimalSI),
+				"memory": *resource.NewQuantity(lm, resource.BinarySI),
+			},
+			Requests: corev1.ResourceList{
+				"cpu":    *resource.NewQuantity(rc, resource.DecimalSI),
+				"memory": *resource.NewQuantity(rm, resource.BinarySI),
+			},
+		}
+		res = append(res, r)
+	}
+	return res
+}
+
+func getSts(clientset kubernetes.Interface, namespace, label string) []Res {
+	stss, err := clientset.AppsV1().StatefulSets(namespace).List(context.TODO(), metav1.ListOptions{
+		LabelSelector: label,
+	})
+	if err != nil {
+		return nil
+	}
+	var res []Res
+	for _, d := range stss.Items {
+		r := Res{
+			Namespace: d.Namespace,
+			Name:      d.Name,
+			Type:      "StatefulSet",
 		}
 		var rc, rm, lc, lm int64
 		for _, c := range d.Spec.Template.Spec.Containers {
