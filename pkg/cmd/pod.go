@@ -19,6 +19,7 @@ func podCmd() *cobra.Command {
 	o := resource.PodOption{}
 	podCmd := &cobra.Command{
 		Use:                   "pod [NAME | -l label]",
+		Short:                 "pod provides an overview of the pod",
 		DisableFlagsInUseLine: true,
 		Example:               KRPodExample,
 		Aliases:               []string{"pods", "po"},

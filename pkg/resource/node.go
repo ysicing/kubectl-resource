@@ -57,12 +57,12 @@ func (o *NodeOption) RunResourceNode() error {
 		return output.EncodeYAML(os.Stdout, data)
 	default:
 		table := uitable.New()
-		table.AddRow("Name", "IP", "CPU使用", "CPU分配", "CPU限制", "CPU容量", "内存使用", "内存分配", "内存限制", "内存容量", "pod数", "pod容量")
+		table.AddRow("Name", "IP", "CPU使用", "CPU分配", "CPU限制", "CPU容量", "内存使用", "内存分配", "内存限制", "内存容量", "pod数", "pod容量", "存活时间")
 		for _, d := range data {
 			table.AddRow(d.NodeName, d.NodeIP,
 				d.CPUUsages, fmt.Sprintf("%v(%v)", d.CPURequests, d.CPURequestsFraction), fmt.Sprintf("%v(%v)", d.CPULimits, d.CPULimitsFraction), d.CPUCapacity,
 				d.MemoryUsages, fmt.Sprintf("%v(%v)", d.MemoryRequests, d.MemoryRequestsFraction), fmt.Sprintf("%v(%v)", d.MemoryLimits, d.MemoryLimitsFraction), d.MemoryCapacity,
-				d.AllocatedPods, d.PodCapacity)
+				fmt.Sprintf("%v(%v)", d.AllocatedPods, d.PodFraction), d.PodCapacity, d.Age)
 		}
 		return output.EncodeTable(os.Stdout, table)
 	}

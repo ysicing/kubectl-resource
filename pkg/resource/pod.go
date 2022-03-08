@@ -1,6 +1,7 @@
 package resource
 
 import (
+	"fmt"
 	"os"
 	"strings"
 
@@ -73,9 +74,11 @@ func (p *PodOption) RunResourcePod() error {
 		return output.EncodeYAML(os.Stdout, data)
 	default:
 		table := uitable.New()
-		table.AddRow("Name", "IP", "CPU使用", "CPU分配", "CPU限制", "CPU容量", "内存使用", "内存分配", "内存限制", "内存容量", "pod数", "pod容量")
+		table.AddRow("Namespace", "Name", "CPU使用", "CPU分配", "CPU限制", "内存使用", "内存分配", "内存限制")
 		for _, d := range data {
-			table.AddRow(d)
+			table.AddRow(d.Namespace, d.Name,
+				fmt.Sprintf("%v(%v)", d.CPUUsages, d.CPUUsagesFraction), d.CPURequests, d.CPULimits,
+				fmt.Sprintf("%v(%v)", d.MemoryUsages, d.MemoryUsagesFraction), d.MemoryRequests, d.MemoryLimits)
 		}
 		return output.EncodeTable(os.Stdout, table)
 	}

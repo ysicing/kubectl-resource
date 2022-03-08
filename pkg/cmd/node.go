@@ -17,6 +17,7 @@ func nodeCmd() *cobra.Command {
 	nodeCmd := &cobra.Command{
 		Use:                   "node",
 		DisableFlagsInUseLine: true,
+		Short:                 "node provides an overview of the node",
 		Aliases:               []string{"nodes", "no"},
 		Example:               KRNodeExample,
 		Run: func(cmd *cobra.Command, args []string) {

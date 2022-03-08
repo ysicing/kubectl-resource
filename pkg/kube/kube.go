@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"time"
 
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -210,6 +211,8 @@ type NodeResources struct {
 	AllocatedPods int    `json:"allocatedPods" yaml:"allocatedPods"`
 	PodCapacity   int64  `json:"podCapacity" yaml:"podCapacity"`
 	PodFraction   string `json:"podFraction" yaml:"podFraction"`
+
+	Age string `json:"age" yaml:"age"`
 }
 
 //NodeResources
@@ -249,6 +252,7 @@ func (k *KubeClient) GetNodeResources(sortBy string, selector labels.Selector) (
 
 		resource.NodeName = nodename
 		resource.NodeIP = nodes[nodename].Status.Addresses[0].Address
+		resource.Age = time.Since(nodes[nodename].CreationTimestamp.Time).String()
 		noderesource, err := getNodeAllocatedResources(nodes[nodename], activePodsList, NodeMetricsList)
 		if err != nil {
 			log.Printf("Couldn't get allocated resources of %s node: %s\n", nodename, err)
@@ -308,7 +312,6 @@ func (k *KubeClient) GetPodResources(podmetrics []metricsapi.PodMetrics, namespa
 
 		resource.Name = podmetric.Name
 		resource.Namespace = podmetric.Namespace
-
 		podresource, err := getPodAllocatedResources(pod, &podmetric)
 		if err != nil {
 			return nil, err
