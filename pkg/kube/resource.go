@@ -10,23 +10,23 @@ import (
 // CPUResources describes node allocated resources.
 type CPUResources struct {
 	// CPUUsages is number of allocated milicores.
-	CPUUsages *CpuResource
+	CPUUsages *CPUResource
 
 	// CPURequests is number of allocated milicores.
-	CPURequests *CpuResource
+	CPURequests *CPUResource
 
 	// CPURequestsFraction is a fraction of CPU, that is allocated.
 	CPURequestsFraction float64 `json:"cpuRequestsFraction"`
 
 	// CPULimits is defined CPU limit.
-	CPULimits *CpuResource
+	CPULimits *CPUResource
 
 	// CPULimitsFraction is a fraction of defined CPU limit, can be over 100%, i.e.
 	// overcommitted.
 	CPULimitsFraction float64 `json:"cpuLimitsFraction"`
 
 	// CPUCapacity is specified node CPU capacity in milicores.
-	CPUCapacity *CpuResource
+	CPUCapacity *CPUResource
 }
 
 // MemoryResources describes node allocated resources.
@@ -73,16 +73,16 @@ type NodeAllocatedResources struct {
 // PodAllocatedResources describes node allocated resources.
 type PodAllocatedResources struct {
 	// CPUUsages is number of allocated milicores.
-	CPUUsages *CpuResource
+	CPUUsages *CPUResource
 
 	// CPURequestsFraction is a fraction of CPU, that is allocated.
 	CPUUsagesFraction float64 `json:"cpuUsagesFraction"`
 
 	// CPURequests is number of allocated milicores.
-	CPURequests *CpuResource
+	CPURequests *CPUResource
 
 	// CPULimits is defined CPU limit.
-	CPULimits *CpuResource
+	CPULimits *CPUResource
 
 	// MemoryUsages is a fraction of memory, that is allocated.
 	MemoryUsages *MemoryResource
@@ -115,16 +115,6 @@ func getNodeMetricsByNodeName(nodeMetricsList *metricsapi.NodeMetricsList) map[s
 
 	return nodeMetricsByName
 }
-
-// // getNodeMetricsByPodName returns a map of node metrics where the keys are the particular pod names
-// func getPodMetricsByPodName(podMetricsList []metricsapi.PodMetrics) map[string]metricsapi.PodMetrics {
-// 	podMetricsByName := make(map[string]metricsapi.PodMetrics)
-// 	for _, metrics := range podMetricsList {
-// 		podMetricsByName[metrics.Name] = metrics
-// 	}
-
-// 	return podMetricsByName
-// }
 
 func getPodMetrics(m *metricsapi.PodMetrics) v1.ResourceList {
 	podMetrics := make(v1.ResourceList)
@@ -178,9 +168,9 @@ func getNodeAllocatedResources(node v1.Node, podList *v1.PodList, nodeMetricsLis
 		reqs[v1.ResourceMemory], limits[v1.ResourceMemory]
 	_cpuUsages, _memoryUsages := usageMetrics.Usage.Cpu().MilliValue(), usageMetrics.Usage.Memory().Value()
 
-	cpuUsages := NewCpuResource(_cpuUsages)
-	cpuRequests := NewCpuResource(_cpuRequests.MilliValue())
-	cpuLimits := NewCpuResource(_cpuLimits.MilliValue())
+	cpuUsages := NewCPUResource(_cpuUsages)
+	cpuRequests := NewCPUResource(_cpuRequests.MilliValue())
+	cpuLimits := NewCPUResource(_cpuLimits.MilliValue())
 
 	memoryUsages := NewMemoryResource(_memoryUsages)
 	memoryRequests := NewMemoryResource(_memoryRequests.Value())
@@ -195,7 +185,7 @@ func getNodeAllocatedResources(node v1.Node, podList *v1.PodList, nodeMetricsLis
 			CPURequestsFraction: cpuRequests.calcPercentage(capacity.Cpu()),
 			CPULimits:           cpuLimits,
 			CPULimitsFraction:   cpuLimits.calcPercentage(capacity.Cpu()),
-			CPUCapacity:         NewCpuResource(capacity.Cpu().MilliValue()),
+			CPUCapacity:         NewCPUResource(capacity.Cpu().MilliValue()),
 		},
 		MemoryResources{
 			MemoryUsages:           memoryUsages,
@@ -216,7 +206,6 @@ func getNodeAllocatedResources(node v1.Node, podList *v1.PodList, nodeMetricsLis
 
 //getPodAllocatedResources
 func getPodAllocatedResources(pod *v1.Pod, podmetric *metricsapi.PodMetrics) (PodAllocatedResources, error) {
-
 	reqs, limits := map[v1.ResourceName]resource.Quantity{}, map[v1.ResourceName]resource.Quantity{}
 
 	podReqs, podLimits, err := PodRequestsAndLimits(pod)
@@ -248,9 +237,9 @@ func getPodAllocatedResources(pod *v1.Pod, podmetric *metricsapi.PodMetrics) (Po
 		reqs[v1.ResourceMemory], limits[v1.ResourceMemory]
 	_cpuUsages, _memoryUsages := usageMetrics[v1.ResourceCPU], usageMetrics[v1.ResourceMemory]
 
-	cpuUsages := NewCpuResource(_cpuUsages.MilliValue())
-	cpuRequests := NewCpuResource(_cpuRequests.MilliValue())
-	cpuLimits := NewCpuResource(_cpuLimits.MilliValue())
+	cpuUsages := NewCPUResource(_cpuUsages.MilliValue())
+	cpuRequests := NewCPUResource(_cpuRequests.MilliValue())
+	cpuLimits := NewCPUResource(_cpuLimits.MilliValue())
 
 	memoryUsages := NewMemoryResource(_memoryUsages.Value())
 	memoryRequests := NewMemoryResource(_memoryRequests.Value())

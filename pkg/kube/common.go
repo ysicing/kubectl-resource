@@ -11,16 +11,8 @@ import (
 )
 
 const (
-	warning_threshold  = 90.00
-	critical_threshold = 95.00
-)
-const (
-	// nvidia.com/gpu, number
-	ResourceNvidiaGpuCounts v1.ResourceName = "nvidia.com/gpu"
-	// aliyun.com/gpu-count, number
-	ResourceAliyunGpuCounts v1.ResourceName = "aliyun.com/gpu-count"
-	// aliyun.com/gpu-mem, number
-	ResourceAliyunGpuMem v1.ResourceName = "aliyun.com/gpu-mem"
+	warningThreshold  = 80.00
+	criticalThreshold = 90.00
 )
 
 // NewGpuResource returns the list of NewGpuResource
@@ -64,44 +56,26 @@ func (r *MemoryResource) ToQuantity() *resource.Quantity {
 	return resource.NewQuantity(r.Value(), resource.BinarySI)
 }
 
-type CpuResource struct {
+type CPUResource struct {
 	*resource.Quantity
 }
 
-//NewCpuResource
-func NewCpuResource(value int64) *CpuResource {
+//NewCPUResource
+func NewCPUResource(value int64) *CPUResource {
 	r := resource.NewMilliQuantity(value, resource.DecimalSI)
-	return &CpuResource{r}
+	return &CPUResource{r}
 }
 
 //String
-func (r *CpuResource) String() string {
+func (r *CPUResource) String() string {
 	// XXX: Support more units
 	return fmt.Sprintf("%vm", r.MilliValue())
-}
-
-//newFormat
-func newFormat(a string, b string) string {
-	return fmt.Sprintf("%s/%s", a, b)
-}
-
-//intToString int转string
-func intToString(a int) string {
-	str := strconv.Itoa(a)
-	return str
 }
 
 //float64ToString float64转string
 func float64ToString(s float64) string {
 	//return strconv.FormatFloat(s, 'G', -1, 32)
 	return fmt.Sprintf("%v%%", strconv.FormatFloat(s, 'G', -1, 64))
-
-}
-
-//int64ToString int64转string
-func int64ToString(a int64) string {
-	str := strconv.FormatInt(a, 10)
-	return str
 }
 
 //StringTofloat64
@@ -111,12 +85,12 @@ func stringTofloat64(a string) float64 {
 }
 
 //calcPercentage
-func (r *CpuResource) calcPercentage(divisor *resource.Quantity) float64 {
+func (r *CPUResource) calcPercentage(divisor *resource.Quantity) float64 {
 	return calcPercentage(r.MilliValue(), divisor.MilliValue())
 }
 
 //ToQuantity
-func (r *CpuResource) ToQuantity() *resource.Quantity {
+func (r *CPUResource) ToQuantity() *resource.Quantity {
 	return resource.NewMilliQuantity(r.MilliValue(), resource.DecimalSI)
 }
 
@@ -142,9 +116,9 @@ func FieldString(str string) float64 {
 
 //Compare
 func ExceedsCompare(a string) string {
-	if FieldString(a) > float64(critical_threshold) {
+	if FieldString(a) > float64(criticalThreshold) {
 		return redColor(a)
-	} else if FieldString(a) > float64(warning_threshold) {
+	} else if FieldString(a) > float64(warningThreshold) {
 		return yellowColor(a)
 	} else {
 		return a
