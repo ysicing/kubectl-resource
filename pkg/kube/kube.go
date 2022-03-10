@@ -64,11 +64,14 @@ func New(cc *ClientConfig) (client kubernetes.Interface, metricsClient *metrics.
 func NewFromConfig(cc *ClientConfig) (client kubernetes.Interface, metricsClient *metrics.Clientset, err error) {
 	loadingRules := clientcmd.NewDefaultClientConfigLoadingRules()
 	if cc.KubeConfig == "" {
-		dir, err := os.UserHomeDir()
-		if err != nil {
-			return nil, nil, err
+		cc.KubeConfig = os.Getenv("KUBECONFIG")
+		if cc.KubeConfig == "" {
+			dir, err := os.UserHomeDir()
+			if err != nil {
+				return nil, nil, err
+			}
+			cc.KubeConfig = filepath.Join(dir, ".kube", "config")
 		}
-		cc.KubeConfig = filepath.Join(dir, ".kube", "config")
 	}
 
 	loadingRules.ExplicitPath = cc.KubeConfig
