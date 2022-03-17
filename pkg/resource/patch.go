@@ -18,9 +18,24 @@ type PatchOption struct {
 	KubeCtx    string
 	KubeConfig string
 	Skip       int
+	Name       string
+	Namespace  string
+	NoStop     bool
 }
 
 func (p *PatchOption) Validate() {
+}
+
+func (p *PatchOption) RunNodePatch() error {
+	cfg := kube.ClientConfig{
+		KubeCtx:    p.KubeCtx,
+		KubeConfig: p.KubeConfig,
+	}
+	k, err := kube.NewKubeClient(&cfg)
+	if err != nil {
+		return err
+	}
+	return k.PatchReplicas(p.Namespace, p.Name, p.NoStop)
 }
 
 func (p *PatchOption) RunResourcePatch() error {
