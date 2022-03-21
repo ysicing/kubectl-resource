@@ -49,17 +49,20 @@ func (k *KubeClient) PatchReplicas(ns, name string, nostop bool) error {
 			d.Spec.Replicas = ptr.Int32Ptr(0)
 		}
 	}
-	if d.Spec.Template.Spec.NodeSelector == nil {
-		log.Println("没有设置节点选择器, 设置")
-		d.Spec.Template.Spec.NodeSelector = map[string]string{
-			"k8s.easycorp.work/pool": "free",
-		}
-		d.Spec.Template.Spec.Tolerations = []corev1.Toleration{
-			{
-				Operator: "Exists",
-			},
+	if d.Spec.Template.Spec.Containers[0].Resources.Requests.Cpu().AsApproximateFloat64()*1000.0 <= 100.0 {
+		if d.Spec.Template.Spec.NodeSelector == nil {
+			log.Println("没有设置节点选择器, 设置")
+			d.Spec.Template.Spec.NodeSelector = map[string]string{
+				"k8s.easycorp.work/pool": "free",
+			}
+			d.Spec.Template.Spec.Tolerations = []corev1.Toleration{
+				{
+					Operator: "Exists",
+				},
+			}
 		}
 	}
+
 	if d.Spec.Template.Spec.Containers[0].ReadinessProbe == nil {
 		log.Println("没有检测到ReadinessProbe, 添加")
 		d.Spec.Template.Spec.Containers[0].ReadinessProbe = &corev1.Probe{
