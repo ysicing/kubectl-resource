@@ -22,14 +22,16 @@ kubectl krew install kr
 ### Bash
 
 ```bash
-curl -L --remote-name-all https://github.com/ysicing/kube-resource/releases/latest/download/kr_linux_amd64{,.sha256sum}
+curl -L --remote-name-all https://github.com/ysicing/kubectl-resource/releases/latest/download/kr_linux_amd64{,.sha256sum}
 sha256sum --check kr_linux_amd64.sha256sum
-mv kr_linux_amd64 /usr/local/bin/kr
-chmod +x /usr/local/bin/kr
+mv kr_linux_amd64 /usr/local/bin/kubectl-kr
+chmod +x /usr/local/bin/kubectl-kr
+ln -s /usr/local/bin/kubectl-kr /usr/local/bin/kr
 ```
 
 ## Usage
 
 ```bash
+kubectl kr [OPTIONS]
 kr [OPTIONS]
 ```

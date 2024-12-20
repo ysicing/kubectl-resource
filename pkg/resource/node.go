@@ -6,8 +6,8 @@ import (
 	"strings"
 
 	"github.com/gosuri/uitable"
-	"github.com/ysicing/kube-resource/pkg/kube"
-	"github.com/ysicing/kube-resource/pkg/output"
+	"github.com/ysicing/kubectl-resource/pkg/kube"
+	"github.com/ysicing/kubectl-resource/pkg/output"
 	"k8s.io/apimachinery/pkg/labels"
 )
 

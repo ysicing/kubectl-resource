@@ -13,14 +13,14 @@ var (
 	GitCommitHash string
 )
 
-var versionTpl = `tools: kube-resource
+var versionTpl = `tools: kubectl-resource
  Version:           %v
  Go version:        %v
  Git commit:        %v
  Built:             %v
  OS/Arch:           %v
  Experimental:      false
- Repo: https://github.com/ysicing/kube-resource/releases/tag/%v
+ Repo: https://github.com/ysicing/kubectl-resource/releases/tag/%v
 `
 
 const (
@@ -35,7 +35,7 @@ func init() {
 
 var versionCmd = &cobra.Command{
 	Use:   "version",
-	Short: "Print the version number of kube-resource",
+	Short: "Print the version number of kubectl-resource",
 	Run: func(cmd *cobra.Command, args []string) {
 		if Version == "" {
 			Version = defaultVersion

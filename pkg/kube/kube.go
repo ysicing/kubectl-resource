@@ -146,7 +146,7 @@ func (cc *ClientConfig) apply(config *rest.Config) {
 	}
 }
 
-//GetNodes
+// GetNodes
 func (k *KubeClient) GetNodes(resourceName string, selector labels.Selector) (map[string]corev1.Node, error) {
 	nodes := make(map[string]corev1.Node)
 	if len(resourceName) > 0 {
@@ -169,7 +169,7 @@ func (k *KubeClient) GetNodes(resourceName string, selector labels.Selector) (ma
 	return nodes, nil
 }
 
-//GetActivePodByNodename
+// GetActivePodByNodename
 func (k *KubeClient) GetActivePodByNodename(node corev1.Node) (*corev1.PodList, error) {
 	fieldSelector, err := fields.ParseSelector("spec.nodeName=" + node.Name +
 		",status.phase!=" + string(corev1.PodSucceeded) +
@@ -185,7 +185,7 @@ func (k *KubeClient) GetActivePodByNodename(node corev1.Node) (*corev1.PodList, 
 	return activePods, err
 }
 
-//GetActivePodByPodname
+// GetActivePodByPodname
 func (k *KubeClient) GetPodByPodname(podName string, namespace string) (*corev1.Pod, error) {
 	pod, err := k.apiClient.CoreV1().Pods(namespace).Get(context.TODO(), podName, metav1.GetOptions{})
 	if err != nil {
@@ -218,7 +218,7 @@ type NodeResources struct {
 	Age string `json:"age" yaml:"age"`
 }
 
-//NodeResources
+// NodeResources
 func (k *KubeClient) GetNodeResources(sortBy string, selector labels.Selector) ([]NodeResources, error) {
 	//resources := make(map[string]map[string]interface{})
 	var resources []NodeResources

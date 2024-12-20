@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
-	"github.com/ysicing/kube-resource/pkg/resource"
+	"github.com/ysicing/kubectl-resource/pkg/resource"
 	"k8s.io/kubectl/pkg/util/templates"
 )
 

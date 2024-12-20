@@ -32,9 +32,9 @@ build: clean ## 构建二进制
 	@gox -osarch="darwin/amd64 darwin/arm64 linux/amd64 linux/arm64 windows/amd64 windows/arm64" \
         -output="dist/kr_{{.OS}}_{{.Arch}}" \
     	-ldflags   "-w -s \
-    				-X 'github.com/ysicing/kube-resource/pkg/cmd.Version=${BUILD_VERSION}' \
-                    -X 'github.com/ysicing/kube-resource/pkg/cmd.BuildDate=${BUILD_DATE}' \
-                    -X 'github.com/ysicing/kube-resource/pkg/cmd.GitCommitHash=${COMMIT_SHA1}'"
+    				-X 'github.com/ysicing/kubectl-resource/pkg/cmd.Version=${BUILD_VERSION}' \
+                    -X 'github.com/ysicing/kubectl-resource/pkg/cmd.BuildDate=${BUILD_DATE}' \
+                    -X 'github.com/ysicing/kubectl-resource/pkg/cmd.GitCommitHash=${COMMIT_SHA1}'"
 
 release:  ## github release
 	ghr -u ysicing -t $(GITHUB_RELEASE_TOKEN) -b "release ${BUILD_VERSION}" -n "release ${BUILD_VERSION}" -soft --debug ${BUILD_VERSION} dist

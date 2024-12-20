@@ -1,6 +1,6 @@
 package main
 
-import "github.com/ysicing/kube-resource/pkg/cmd"
+import "github.com/ysicing/kubectl-resource/pkg/cmd"
 
 func main() {
 	cmd.Execute()
